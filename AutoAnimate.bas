@@ -536,10 +536,16 @@ Private Sub BFSFromNode(startIdx As Long, _
             Dim dst As Long: dst = dstIdx(a)
             Dim size As Long: size = 1
             groups(nGroups, 0) = a
-            If dst >= 0 And Not visitedShape(dst) Then
-                groups(nGroups, 1) = dst
-                size = 2
-                visitedShape(dst) = True
+            ' VBA's And is NOT short-circuit, so we must guard the array
+            ' access with a separate If — accessing visitedShape(-1) when an
+            ' arrow's head couldn't be matched would raise "subscript out of
+            ' range".
+            If dst >= 0 Then
+                If Not visitedShape(dst) Then
+                    groups(nGroups, 1) = dst
+                    size = 2
+                    visitedShape(dst) = True
+                End If
             End If
             groupSizes(nGroups) = size
             nGroups = nGroups + 1
